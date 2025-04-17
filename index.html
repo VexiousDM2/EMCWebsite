@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pertolongan Pertama Luka Bakar - DARATIN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        /* --- Reset & Base Styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.7;
+            color: #333333; /* Dark Grey Text */
+            background-color: #FFF8F8; /* Very light pinkish off-white background */
+            overflow-x: hidden; /* Prevent horizontal scroll ON BODY */
+            position: relative; /* Needed for z-index stacking */
+        }
+
+        /* --- Loading Screen --- */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #900C3F; /* Dark Red Background */
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.7s ease-out, visibility 0s 0.7s linear; /* Fade out transition */
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #loader.loaded {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .spinner {
+            border: 5px solid rgba(255, 255, 255, 0.2); /* Light border */
+            border-top: 5px solid #FF5733; /* Orange-Red top */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+        /* --- Background Canvas --- */
+        #bg-canvas {
+            position: absolute; /* Position relative to #bijak-wrapper */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Place canvas behind wrapper's content */
+        }
+
+        /* --- Utility Classes --- */
+        .container {
+            max-width: 1150px; /* Slightly wider */
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        section {
+            padding: 80px 0;
+            /* overflow: hidden; */ /* REMOVE overflow hidden for non-scrolling sections */
+            position: relative;
+            z-index: 1;
+        }
+
+        section:nth-child(odd) {
+             background-color: #FFF8F8;
+        }
+         section:nth-child(even) {
+              background-color: #ffffff;
+         }
+
+        /* Enhanced Card Style (inspired by Skillora) */
+        .enhanced-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(144, 12, 63, 0.08); /* Subtle red shadow */
+            border: 1px solid #fdeeee; /* Very light red border */
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px; /* Add space between cards if stacked */
+            /* Ensure elements inside cards are visible */
+            opacity: 1;
+        }
+        .enhanced-card:hover {
+             box-shadow: 0 8px 25px rgba(144, 12, 63, 0.15);
+             /* transform: translateY(-4px); */ /* Hover handled differently in horiz scroll */
+        }
+
+        h1, h2, h3 {
+            color: #900C3F; /* Dark Red/Maroon */
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        h1 { font-size: 3rem; line-height: 1.2; text-shadow: 1px 1px 3px rgba(0,0,0,0.1);}
+        h2 {
+            font-size: 2.3rem;
+            margin-bottom: 30px;
+            color: #900C3F; /* Revert to original dark red base color */
+            /* Neon effect removed from general h2, will be applied per section */
+        } /* Larger section titles */
+        h3 { font-size: 1.5rem; color: #C70039; font-weight: 500; } /* Strong Red for subheads */
+
+        p {
+            margin-bottom: 15px;
+            color: #444;
+            font-weight: 400;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        /* --- Header / Hero Section --- */
+        #hero {
+            background: linear-gradient(135deg, #C70039 0%, #FF5733 100%);
+            color: #fff;
+            text-align: center;
+            padding: 150px 0 120px 0; /* More top padding */
+            position: relative;
+            z-index: 1;
+             background-color: transparent;
+             /* Ensure text is fully visible by default */
+             opacity: 1;
+        }
+
+        #hero h1, #hero .subtitle, #hero p {
+            opacity: 1 !important; /* Override any potential JS fade */
+            transform: none !important; /* Override any potential JS slide */
+        }
+
+        #hero h1 {
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        #hero .subtitle {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.25);
+        }
+
+        #hero p {
+            color: #f5f5f5;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+            font-size: 1.1rem;
+        }
+
+        /* --- Definition Section --- */
+        #definisi {
+            text-align: center;
+        }
+         #definisi p {
+             max-width: 850px; /* Slightly wider */
+             margin-left: auto;
+             margin-right: auto;
+             font-size: 1.05rem;
+             opacity: 1; /* Ensure visible */
+             color: black; /* Dark Orange */
+         }
+         #definisi h2 {
+             opacity: 1; /* Ensure visible */
+             color: #00BFFF; /* Deep Sky Blue */
+             text-shadow: 0 0 8px rgba(0, 191, 255, 0.6), 0 0 15px rgba(0, 191, 255, 0.4);
+         }
+
+        /* --- Tingkatan (Severity) Section --- */
+        #tingkatan h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            opacity: 1; /* Ensure visible */
+        }
+        #tingkatan .section-subtitle {
+            text-align: center;
+            max-width: 700px;
+            margin: -10px auto 40px auto;
+            color: #555;
+            opacity: 1; /* Ensure visible */
+        }
+
+        .tingkatan-table {
+            width: 100%;
+            max-width: 900px;
+            margin: 30px auto;
+            border-collapse: collapse;
+            box-shadow: 0 4px 15px rgba(144, 12, 63, 0.1);
+            background-color: #fff;
+            overflow: hidden;
+            border-radius: 10px;
+            border: 1px solid #fde0e0;
+            opacity: 1; /* Ensure visible */
+        }
+
+        .tingkatan-table th, .tingkatan-table td {
+            border: 1px solid #fdeeee;
+            padding: 16px 20px; /* More padding */
+            text-align: left;
+            font-weight: 400;
+        }
+
+        .tingkatan-table th {
+            background-color: #fceeee;
+            color: #900C3F;
+            font-weight: 600;
+        }
+
+        .tingkatan-table tr:nth-child(even) td {
+            background-color: #FFF8F8;
+        }
+
+        .tingkatan-table td strong {
+             font-weight: 600;
+             color: #C70039;
+        }
+
+        #tingkatan h2{
+            text-align: center;
+            margin-bottom: 50px;
+            opacity: 1; /* Ensure visible */
+            color: #900C3F; /* Light Sea Green */
+            text-shadow: 0 0 8px rgba(164, 52, 32, 0.6), 0 0 15px rgba(220, 98, 22, 0.4);
+        }
+        /* --- Jenis (Types) Section --- */
+        #jenis h2 {
+            text-align: center;
+            margin-bottom: 50px;
+            opacity: 1; /* Ensure visible */
+            color: #20B2AA; /* Light Sea Green */
+            text-shadow: 0 0 8px rgba(32, 178, 170, 0.6), 0 0 15px rgba(32, 178, 170, 0.4);
+        }
+        .jenis-container {
+            display: grid; /* Use grid for better control */
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 30px;
+            justify-content: center;
+            opacity: 1; /* Ensure container itself is visible */
+        }
+        .jenis-item {
+            /* Inherit enhanced-card styles */
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 4px solid #C70039; /* Strong Red accent top */
+            opacity: 1 !important; /* Ensure items are fully visible */
+            transform: none !important; /* Reset any transform */
+        }
+         .jenis-item:hover {
+             transform: translateY(-6px) scale(1.03) !important; /* Apply hover transform */
+             box-shadow: 0 8px 25px rgba(144, 12, 63, 0.18);
+         }
+        .jenis-item .icon i { /* Style Font Awesome icons */
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: #FF5733; /* Orange-Red Icon */
+            display: block;
+            line-height: 1;
+        }
+        .jenis-item h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #C70039;
+        }
+         .jenis-item p {
+             font-size: 0.9rem;
+             color: #666;
+             margin-bottom: 0; /* Remove bottom margin for card layout */
+         }
+
+        /* --- DARATIN Horizontal Scroll Section (Panel Layout) --- */
+        #daratin {
+            /* REMOVED fixed height */
+            overflow: hidden; /* Hide vertical overflow */
+            padding: 20px 0 0 0; /* Remove padding, panels are full width/height */
+            margin-top:30px;
+            margin-bottom:30px;
+            padding: 20px;
+            background-color: #FFF8F8;
+            position: relative; /* Needed for absolute positioned title */
+        }
+        /*#daratin h2 { /* Title is now static within the section */
+        /*    text-align: left; /* Align to the left */
+        /*    opacity: 0; /* Start hidden for animation */
+        /*    margin-left: 5vw; /* Add some left margin */
+        /*    margin-bottom: 40px; /* Space below title */
+        /*    color: turquoise; /* Pale Turquoise */
+        /*    text-shadow: 0 0 10px rgba(175, 238, 238, 0.7), 0 0 18px rgba(175, 238, 238, 0.5);
+        /*    font-weight: bold;
+        /*    /* Removed absolute positioning, background, shadow, etc. */
+        /*    /* Add transition for fade-in */
+        /*    transition: opacity 0.8s ease-out;
+        }*/
+
+        /* Container for the flex items (panels) */
+        .daratin-steps {
+            display: flex;
+            flex-wrap: nowrap;
+            width: 80%; /* Modified width */
+            height: 80vh;
+            padding-top: 5vh;
+            padding-bottom: 5vh;
+            margin: 20px 0; /* Reset margin */
+            position: relative; /* Needed for GSAP */
+            opacity: 1;
+        }
+
+        /* Individual Panel Styling */
+        .daratin-step {
+            flex: 0 0 90vw; /* Make panel slightly narrower */
+            height: 100%; /* Fit within parent */
+            margin: 0 5vw; /* Increased horizontal margins for more space */
+            display: flex;
+            /* align-items: center; */ /* Center content vertically */
+            /* justify-content: center; */ /* Center content horizontally */
+            padding: 0 6vw;
+            position: relative; /* For positioning letter */
+            overflow: visible;
+            /* Remove card styles */
+            background-color: transparent; /* Panels are transparent over section bg */
+            border: none;
+            box-shadow: none;
+            border-radius: 0;
+            opacity: 1;
+            transform: none;
+            /* gap: 30px; */ /* Replaced with margins on children */
+            align-items: stretch; /* Stretch items to equal height */
+        }
+        .daratin-step:nth-child(even) {
+            /* Optional: Alternate background slightly if needed */
+            /* background-color: rgba(255, 255, 255, 0.1); */
+        }
+
+        /* Large Letter Styling */
+        .daratin-step .letter-panel {
+            font-size: 30vh; /* Even larger letter */
+            font-weight: 700;
+            color: rgba(199, 0, 57, 0.12); /* Slightly more transparent */
+            line-height: 1;
+            flex-basis: 20%; /* Less space for letter */
+            text-align: center;
+            user-select: none; /* Prevent text selection */
+            z-index: 1;
+            /* margin-right: -2vw; */ /* Removed overlap */
+            margin-right: 3vw; /* Add margin between letter and content panel */
+            vertical-align: middle;
+        }
+
+        /* Content Area Styling */
+        .daratin-step .content-panel {
+            flex-basis: 55%; /* Further increased space for text content */
+            flex-shrink: 1;
+            z-index: 2; /* Content above letter */
+            background: rgba(255, 255, 255, 0.75); /* White background for text only */
+            height: auto; /* Size based on content */
+            padding: 30px; /* Padding */
+            border-radius: 12px; /* Rounded corners */
+            box-shadow: 0 5px 20px rgba(0,0,0,0.07); /* Shadow */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            margin-right: 3vw; /* Add margin between content panel and image */
+        }
+        /* Removed .daratin-step .text-content rule */
+
+        .daratin-step h3 {
+            font-size: 2rem; /* Larger heading */
+            margin-bottom: 20px; /* More space below heading */
+            color: #900C3F;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .daratin-step h3 i {
+            font-size: 1.2em;
+            color: #FF5733;
+        }
+
+        .daratin-step p {
+            margin-bottom: 18px; /* More space below paragraphs */
+            font-size: 0.9rem; /* Larger paragraph text */
+            line-height: 1.5; /* Increase line height */
+        }
+        .image-placeholder {
+            height: 250px; /* Taller placeholder */
+            background-color: #eee;
+            border-radius: 10px; /* Match content panel radius */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-style: italic;
+            font-size: 1rem;
+            margin-top: 20px;
+            border: 1px dashed #ccc;
+            text-align: center;
+            padding: 10px;
+        }
+        .daratin-image { /* Image as direct child of .daratin-step */
+            display: block;
+            flex-basis: 25%; /* Further decreased space for image */
+            flex-shrink: 1;
+            width: 100%; /* Fill its flex basis */
+            max-width: 100%; /* Ensure it doesn't overflow its flex basis */
+            height: auto; /* Maintain aspect ratio */
+            object-fit: contain; /* Fit within bounds, preserve aspect ratio, no crop */
+            border-radius: 8px; /* Optional: rounded corners */
+            z-index: 1; /* Ensure it's behind potential overlaps if needed */
+            border-radius: 8px; /* Optional: rounded corners */
+            background-color: transparent; /* Light background for transparent parts */
+        }
+        /* Remove float clearing */
+        /* .daratin-step::after { ... } */
+
+
+        /* --- BIJAK Section --- */
+         #bijak-wrapper {
+              /* background-color: #FFF8F8; */ /* Removed so canvas is visible */
+              min-height: 100vh; /* Full viewport height */
+              display: flex;
+              flex-direction: column; /* Stack title and flags */
+              justify-content: center; /* Center vertically */
+              align-items: center; /* Center horizontally */
+              padding: 80px 0 80px 0;
+              /* overflow: hidden; Temporarily removed for testing */
+              position: relative;
+              z-index: 1;
+          }
+          #bijak-wrapper h2 {
+              color: #900C3F;
+              text-align: center;
+              margin-bottom: 50px; /* Adjusted space */
+             font-size: 2.5rem; /* Adjust size */
+             /* Optional: Add subtle shadow if needed */
+             /* text-shadow: 1px 1px 2px rgba(0,0,0,0.1); */
+         }
+
+         .bijak-flags-container {
+             display: flex;
+             justify-content: center; /* Center flags horizontally */
+             align-items: stretch; /* Align flags to top */
+             flex-wrap: nowrap;
+             gap: 1.5%;
+             width: 100%;
+             min-height: 120vh; /* Increased height */
+         }
+
+         .bijak-flag {
+                      background-color: #B80032; /* Lighter red color */
+                      color: #fff;
+                      width: 18.5%; /* Increase width percentage (18.5 * 5 + 1.5 * 4 = 98.5%) */
+                      min-width: 180px; /* Increase min-width */
+                      height: auto; /* Let content determine height initially */
+                      max-height: 300px; /* Increased height */
+                      min-height: auto;
+                      /* padding: 30px 0 0 0; */ /* Moved padding to inner wrapper */
+                      border-radius: 5px 5px 0 0;
+                      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+                      border: none; /* Remove border */
+                      border-bottom: none;
+                      position: relative;
+                      overflow: hidden; /* Keep hidden by default */
+                      clip-path: polygon(0 0, 100% 0, 100% 50%, 50% 75%, 0 50%); /* Adjusted clip-path */
+                      /* Transition max-height, clip-path smoothly on hover */
+                      transition: max-height 0.5s ease-out, clip-path 0.5s ease-out, transform 0.3s ease, box-shadow 0.3s ease;
+                  }
+         /* Expand max-height and modify clipping on hover */
+         .bijak-flag:hover {
+             max-height: 2500px; /* Increased max-height again */
+             box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+             /* Modify clip-path to allow more vertical space before taper */
+             clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
+             /* overflow: hidden; /* Revert to hidden (or remove line as it's inherited) */
+         }
+
+         /* Wrapper for content - Keep static positioning */
+         .flag-content-wrapper {
+             /* position: absolute; Keep commented */
+             /* top: 0; */
+             /* left: 0; */
+             width: 100%;
+             /* min-height: 100%; Keep commented */
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             padding: 30px 10px 40px 10px; /* Added top padding here */
+             box-sizing: border-box;
+             box-shadow: inset 0 0 15px rgba(0,0,0,0.25);
+         }
+
+         /* Reveal content on flag hover - REMOVED */
+         /* .bijak-flag:hover .flag-content-wrapper {
+             transform: translateY(0);
+         } */
+
+
+         .flag-letter {
+             font-size: 6rem; /* Keep size */
+             font-weight: 700;
+             margin-bottom: 10px; /* Reduced margin */
+             line-height: 1;
+             opacity: 0.9; /* Slightly less transparent */
+             flex-shrink: 0;
+             color: #D4AF37; /* Darker gold color for letter */
+         }
+
+         /* Removed duplicate .flag-letter rule */
+
+         .flag-text-letters {
+             display: none; /* Hide the text */
+             flex-direction: column;
+             align-items: center;
+             width: 100%;
+         }
+         .bijak-flag:hover .flag-text-letters {
+            display: flex; /* Show text on hover */
+            /* flex-grow: 1; */ /* Let content determine size */
+            /* overflow: hidden; */ /* Allow text to overflow its container if needed */
+        }
+
+         .flag-text-letters span {
+             display: block;
+             font-size: 1.5rem;
+             line-height: 1.8;
+             font-weight: 500;
+             text-transform: uppercase;
+         }
+         .flag-text-letters span.space {
+             height: 2em; /* Even more space between words */
+         }
+
+
+        /* --- Video Section --- */
+        #video h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            opacity: 1;
+            color: #9370DB; /* Medium Purple */
+            text-shadow: 0 0 8px rgba(147, 112, 219, 0.6), 0 0 15px rgba(147, 112, 219, 0.4);
+        }
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            overflow: hidden;
+            max-width: 920px;
+            margin: 20px auto;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            border-radius: 12px;
+            border: 1px solid #eee;
+             opacity: 1;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: #403131;
+            color: #e0e0e0;
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 60px;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- Animations Preparation --- */
+        .animate-on-scroll {
+            /* Elements are visible by default */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        /* --- Responsiveness --- */
+        /* --- Responsiveness for DARATIN Panels --- */
+        @media (max-width: 768px) {
+            .daratin-step {
+                flex-direction: column; /* Stack letter and content */
+                padding: 8vh 5vw;
+                gap: 20px;
+                justify-content: flex-start; /* Align top */
+                text-align: center;
+            }
+            .daratin-step .letter-panel {
+                font-size: 20vh; /* Adjust responsive letter size */
+                flex-basis: auto; /* Reset basis */
+                margin-bottom: 15px; /* Less margin */
+                margin-right: 0; /* Reset overlap */
+            }
+            .daratin-step .content-panel {
+                flex-basis: auto; /* Reset basis */
+                padding: 20px;
+                width: 90%; /* Limit width */
+                max-width: 500px;
+                margin: 0 auto;
+            }
+             .daratin-step h3 {
+                 font-size: 1.6rem; /* Adjust responsive heading */
+                 justify-content: center;
+             }
+             .daratin-step p { font-size: 1rem; } /* Adjust responsive paragraph */
+             .image-placeholder { height: 180px; } /* Adjust responsive placeholder */
+             #daratin h2 { /* Adjust responsive static title */
+                 font-size: 1.8rem;
+                 margin-left: 4vw;
+                 margin-bottom: 30px;
+                 text-align: center; /* Center on smaller screens if preferred */
+             }
+
+            /* Other responsive styles */
+            h1 { font-size: 2.4rem; }
+            #hero .subtitle { font-size: 2rem; }
+            h2 { font-size: 1.9rem; }
+            section { padding: 60px 0; }
+            #bijak { border-radius: 10px; padding: 50px 20px; }
+            .tingkatan-table th, .tingkatan-table td { padding: 12px 10px; font-size: 0.9rem; }
+            .jenis-container { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        }
+
+        @media (max-width: 576px) {
+            .daratin-step { padding: 6vh 4vw; }
+            .daratin-step .letter-panel { font-size: 18vh; } /* Adjust small screen letter */
+            .daratin-step .content-panel { width: 95%; padding: 20px; } /* More padding */
+            .daratin-step h3 { font-size: 1.4rem; } /* Adjust small screen heading */
+            .daratin-step p { font-size: 0.95rem; } /* Adjust small screen paragraph */
+            #daratin h2 { /* Adjust responsive static title */
+                font-size: 1.5rem;
+                margin-left: 3vw;
+                margin-bottom: 25px;
+                text-align: center; /* Center on smaller screens if preferred */
+            }
+
+            /* Other responsive styles */
+            h1 { font-size: 2rem; }
+            #hero { padding: 100px 0 80px 0; }
+            #hero .subtitle { font-size: 1.8rem; }
+            h2 { font-size: 1.7rem; }
+            section { padding: 50px 0; }
+            .container { padding: 0 15px; }
+            .jenis-container { grid-template-columns: 1fr; }
+            .tingkatan-table th, .tingkatan-table td { padding: 10px 8px; font-size: 0.85rem; }
+            .bijak-point { padding: 10px 18px; font-size: 0.9rem; }
+            #bijak { border-radius: 5px; padding: 50px 15px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Background Canvas (Moved to BIJAK section) -->
+
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="container">
+            <h1>LUKA BAKAR?</h1>
+            <div class="subtitle">Cepat DARATIN</div>
+            <p>Panduan Pertolongan Pertama Cepat dan Tepat untuk Mengatasi Luka Bakar</p>
+        </div>
+    </section>
+
+    <!-- Definisi Section -->
+    <section id="definisi">
+        <div class="container">
+            <h2>Apa Pengertian Luka Bakar?</h2>
+            <p >Luka bakar adalah kerusakan jaringan tubuh, terutama kulit, yang disebabkan oleh panas berlebih, paparan zat kimia, listrik, gesekan, atau radiasi. Tingkat keparahannya bervariasi tergantung pada penyebab, suhu, durasi kontak, dan area tubuh yang terkena.</p>
+            <p>Zat yang bersifat membakar seperti asam kuat dan basa kuat juga dapat menyebabkan luka bakar kimia yang serius.</p>
+        </div>
+    </section>
+
+    <!-- Tingkatan Section -->
+    <section id="tingkatan">
+        <div class="container">
+            <h2>Tahukah Kamu? Luka Bakar Memiliki 3 Tingkatan</h2>
+            <p class="section-subtitle">Mengenali tingkat keparahan luka bakar penting untuk menentukan penanganan yang tepat.</p>
+            <div >
+                <table class="tingkatan-table animate-on-scroll"> <!-- Animation only on table -->
+                    <thead>
+                        <tr>
+                            <th>Tingkatan</th>
+                            <th>Lapisan Kulit Terkena</th>
+                            <th>Ciri Utama</th>
+                            <th>Contoh Penyebab</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Luka Bakar Ringan (Derajat 1)</strong></td>
+                            <td>Epidermis (Lapisan terluar)</td>
+                            <td>Kulit kemerahan, nyeri, bengkak ringan, kulit kering tanpa lepuhan.</td>
+                            <td>Terbakar sinar matahari ringan, tersiram air tidak terlalu panas sebentar.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Luka Bakar Sedang (Derajat 2)</strong></td>
+                            <td>Epidermis dan sebagian Dermis (Lapisan tengah)</td>
+                            <td>Kulit melepuh (blister), sangat nyeri, kemerahan hebat, bengkak, tampak basah.</td>
+                            <td>Tersiram air panas, kontak singkat dengan benda panas (setrika, knalpot).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Luka Bakar Berat (Derajat 3)</strong></td>
+                            <td>Seluruh Epidermis & Dermis, bisa mencapai jaringan di bawahnya (lemak, otot, tulang)</td>
+                            <td>Kulit tampak putih pucat, hitam hangus, atau kasar seperti kulit. Nyeri bisa berkurang atau hilang (kerusakan saraf).</td>
+                            <td>Terkena api langsung, kontak lama dengan benda sangat panas, luka bakar listrik, luka bakar kimia parah.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Jenis Section -->
+    <section id="jenis">
+        <div class="container">
+            <h2>Kenali Juga 5 Jenis Luka Bakar</h2>
+            <div class="jenis-container">
+                <div class="jenis-item enhanced-card animate-on-scroll">
+                    <div class="icon"><i class="fas fa-fire-alt"></i></div>
+                    <h3>Termal</h3>
+                    <p>Api, uap, cairan/benda panas.</p>
+                </div>
+                <div class="jenis-item enhanced-card animate-on-scroll">
+                    <div class="icon"><i class="fas fa-flask"></i></div>
+                    <h3>Kimia</h3>
+                    <p>Asam/basa kuat, pelarut.</p>
+                </div>
+                <div class="jenis-item enhanced-card animate-on-scroll">
+                    <div class="icon"><i class="fas fa-bolt"></i></div>
+                    <h3>Listrik</h3>
+                    <p>Arus listrik tegangan tinggi/rendah.</p>
+                </div>
+                <div class="jenis-item enhanced-card animate-on-scroll">
+                    <div class="icon"><i class="fas fa-sun"></i></div>
+                    <h3>Radiasi</h3>
+                    <p>Sinar matahari, radioterapi.</p>
+                </div>
+                <div class="jenis-item enhanced-card animate-on-scroll">
+                    <div class="icon"><i class="fas fa-road"></i></div>
+                    <h3>Gesekan</h3>
+                    <p>Gesekan kulit (misal: aspal).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DARATIN Horizontal Scroll Section -->
+    <section id="daratin">
+        <!-- Title moved outside the scrolling container -->
+
+        <!-- Container for the steps, scrolls horizontally -->
+        <div class="daratin-steps">
+            <!-- Panel D -->
+            <div class="daratin-step">
+                <div class="letter-panel">D</div>
+                <div class="content-panel">
+                    <div class="text-content">
+                        <h3><i class="fas fa-tint"></i> Dialirkan Air Segera</h3>
+                        <p><strong>Mengapa?</strong> Menghentikan proses pembakaran jaringan lebih lanjut, mendinginkan area, dan mengurangi rasa sakit secara signifikan. Air dingin juga membantu membersihkan kotoran awal.</p>
+                        <p><strong>Bagaimana?</strong> Gunakan air bersih bersuhu ruangan atau sedikit dingin (bukan air es!) yang mengalir langsung ke area luka bakar selama minimal 10-20 menit. Pastikan aliran air tidak terlalu deras agar tidak merusak jaringan lebih lanjut.</p>
+                    </div>
+                </div>
+                <img src="Images/D.jpeg" alt="Mengalirkan air ke tangan" class="daratin-image">
+            </div>
+            <!-- Panel A -->
+            <div class="daratin-step">
+                <div class="letter-panel">A</div>
+                <div class="content-panel">
+                    <div class="text-content">
+                        <h3><i class="fas fa-unlink"></i> Angkat Aksesoris & Pakaian</h3>
+                        <p><strong>Mengapa?</strong> Pembengkakan sering terjadi dengan cepat setelah luka bakar. Cincin, jam tangan, gelang, atau pakaian ketat dapat menjepit aliran darah jika area tersebut membengkak.</p>
+                        <p><strong>Bagaimana?</strong> Lepaskan semua perhiasan dan pakaian yang menutupi atau berada di dekat area luka bakar SEGERA. Jika pakaian menempel pada luka, JANGAN dipaksa lepas; gunting di sekelilingnya.</p>
+                    </div>
+                </div>
+                <img src="Images/A1.jpeg" alt="Melepas cincin dari jari" class="daratin-image">
+            </div>
+            <!-- Panel R -->
+            <div class="daratin-step">
+                <div class="letter-panel">R</div>
+                <div class="content-panel">
+                    <div class="text-content">
+                        <h3><i class="fas fa-thermometer-half"></i> Redakan Nyeri & Lindungi</h3>
+                        <p><strong>Mengapa?</strong> Mengurangi penderitaan korban dan melindungi area luka dari kontaminasi lebih lanjut.</p>
+                        <p><strong>Bagaimana?</strong> Setelah dialiri air, kompres area dengan kain bersih yang dibasahi air dingin (bukan es). JANGAN oleskan bahan-bahan seperti pasta gigi, mentega, kecap, kopi, minyak, atau salep tanpa anjuran medis karena dapat menyebabkan infeksi atau memperparah luka.</p>
+                    </div>
+                </div>
+                <img src="Images/R.jpeg" alt="Kompres dingin pada luka" class="daratin-image">
+            </div>
+            <!-- Panel A -->
+            <div class="daratin-step">
+                <div class="letter-panel">A</div>
+                <div class="content-panel">
+                    <div class="text-content">
+                        <h3><i class="fas fa-shield-alt"></i> Amankan Luka (Tutup Longgar)</h3>
+                        <p><strong>Mengapa?</strong> Melindungi luka dari kotoran, bakteri, dan gesekan, serta menjaga kelembaban area luka yang penting untuk penyembuhan.</p>
+                        <p><strong>Bagaimana?</strong> Tutup area luka bakar secara longgar menggunakan perban steril atau kain bersih yang tidak mudah menempel dan tidak berbulu (misalnya, kain katun bersih). Hindari penggunaan kapas karena seratnya bisa menempel pada luka.</p>
+                    </div>
+                </div>
+                <img src="Images/A2.png" alt="Menutup luka dengan perban" class="daratin-image">
+            </div>
+            <!-- Panel T -->
+            <div class="daratin-step">
+                <div class="letter-panel">T</div>
+                <div class="content-panel">
+                    <div class="text-content">
+                        <h3><i class="fas fa-ban"></i> Tidak Memecahkan Lepuhan</h3>
+                        <p><strong>Mengapa?</strong> Lepuhan (blister) adalah mekanisme pertahanan alami tubuh. Cairan di dalamnya steril dan kulit di atasnya melindungi jaringan di bawahnya dari infeksi.</p>
+                        <p><strong>Bagaimana?</strong> Biarkan lepuhan tetap utuh. Jika lepuhan pecah dengan sendirinya, bersihkan area dengan lembut menggunakan air dan sabun ringan, oleskan salep antibiotik (jika ada), dan tutup dengan perban steril.</p>
+                    </div>
+                </div>
+                <img src="Images/T.jpeg" alt="Lepuhan (blister) kulit" class="daratin-image">
+            </div>
+            <!-- Panel I -->
+            <div class="daratin-step">
+                <div class="letter-panel">I</div>
+                <div class="content-panel">
+                    <div class="text-content">
+                        <h3><i class="fas fa-ruler-combined"></i> Identifikasi Tingkat & Luas</h3>
+                        <p><strong>Mengapa?</strong> Menentukan tingkat keparahan dan apakah diperlukan penanganan medis segera.</p>
+                        <p><strong>Bagaimana?</strong> Perhatikan ciri-ciri luka (lihat bagian Tingkatan). Perkirakan luas luka bakar (aturan 1 telapak tangan korban ≈ 1% luas tubuh). Derajat 2/3, luka luas, atau area kritis perlu ke dokter.</p>
+                    </div>
+                </div>
+                <img src="Images/I.png" alt="Perbandingan tingkat luka" class="daratin-image">
+            </div>
+            <!-- Panel N -->
+            <div class="daratin-step">
+                <div class="letter-panel">N</div>
+                <div class="content-panel">
+                    <div class="text-content">
+                        <h3><i class="fas fa-phone-alt"></i> Nomor Darurat / Bantuan Medis</h3>
+                        <p><strong>Mengapa?</strong> Luka bakar tertentu memerlukan penanganan profesional untuk mencegah komplikasi serius seperti infeksi, syok, atau kerusakan permanen.</p>
+                        <p><strong>Bagaimana?</strong> Segera hubungi nomor darurat (112) atau bawa ke IGD jika: luka bakar berat (derajat 3), derajat 2 luas, mengenai wajah/tangan/kaki/vital, listrik/kimia, melingkar, atau pada bayi/lansia.</p>
+                    </div>
+                </div>
+                <img src="Images/N.jpeg" alt="Menghubungi nomor darurat" class="daratin-image">
+            </div>
+        </div> <!-- End .daratin-steps -->
+    </section>
+
+     <!-- BIJAK Section -->
+     <section id="bijak-wrapper">
+         <canvas id="bg-canvas"></canvas> <!-- Canvas moved inside -->
+         <!-- Title moved directly into the wrapper -->
+         <h2 class="animate-on-scroll">Lakukan DARATIN dengan BIJAK</h2>
+         <div class="bijak-flags-container">
+             <div class="bijak-flag">
+                 <div class="flag-content-wrapper">
+                     <div class="flag-letter">B</div>
+                     <div class="flag-text-letters">
+                         <span>E</span><span>R</span><span>S</span><span>I</span><span>K</span><span>A</span><span>P</span>
+                         <span class="space"></span>
+                         <span>T</span><span>E</span><span>N</span><span>A</span><span>N</span><span>G</span>
+                     </div>
+                 </div>
+             </div>
+             <div class="bijak-flag">
+                 <div class="flag-content-wrapper">
+                     <div class="flag-letter">I</div>
+                     <div class="flag-text-letters">
+                         <span>N</span><span>G</span><span>A</span><span>T</span>
+                         <span class="space"></span>
+                         <span>L</span><span>A</span><span>N</span><span>G</span><span>K</span><span>A</span><span>H</span>
+                         <span class="space"></span>
+                         <span>P</span><span>E</span><span>N</span><span>A</span><span>N</span><span>G</span><span>A</span><span>N</span><span>A</span><span>N</span>
+                     </div>
+                 </div>
+             </div>
+             <div class="bijak-flag">
+                 <div class="flag-content-wrapper">
+                     <div class="flag-letter">J</div>
+                     <div class="flag-text-letters">
+                         <span>A</span><span>G</span><span>A</span>
+                         <span class="space"></span>
+                         <span>K</span><span>E</span><span>B</span><span>E</span><span>R</span><span>S</span><span>I</span><span>H</span><span>A</span><span>N</span>
+                         <span class="space"></span>
+                         <span>T</span><span>A</span><span>N</span><span>G</span><span>A</span><span>N</span>
+                         <span class="space"></span>
+                         <span>D</span><span>A</span><span>N</span>
+                         <span class="space"></span>
+                         <span>A</span><span>L</span><span>A</span><span>T</span>
+                     </div>
+                 </div>
+             </div>
+             <div class="bijak-flag">
+                 <div class="flag-content-wrapper">
+                     <div class="flag-letter">A</div>
+                     <div class="flag-text-letters">
+                         <span>J</span><span>U</span><span>K</span><span>A</span><span>N</span>
+                         <span class="space"></span>
+                         <span>P</span><span>E</span><span>R</span><span>T</span><span>O</span><span>L</span><span>O</span><span>N</span><span>G</span><span>A</span><span>N</span>
+                         <span class="space"></span>
+                         <span>J</span><span>I</span><span>K</span><span>A</span>
+                         <span class="space"></span>
+                         <span>D</span><span>A</span><span>R</span><span>U</span><span>R</span><span>A</span><span>T</span>
+                     </div>
+                 </div>
+             </div>
+             <div class="bijak-flag">
+                 <div class="flag-content-wrapper">
+                     <div class="flag-letter">K</div>
+                     <div class="flag-text-letters">
+                         <span>O</span><span>N</span><span>T</span><span>A</span><span>K</span>
+                         <span class="space"></span>
+                         <span>B</span><span>A</span><span>N</span><span>T</span><span>U</span><span>A</span><span>N</span>
+                         <span class="space"></span>
+                         <span>M</span><span>E</span><span>D</span><span>I</span><span>S</span>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </section>
+
+    <!-- Video Section -->
+    <section id="video">
+        <div class="container">
+            <h2>Tonton Video Penjelasan Lengkap</h2>
+            <div class="video-wrapper animate-on-scroll">
+                <iframe width="894" height="503" src="https://www.youtube.com/embed/1ZRWfJJkxWs" title="Pertolongan Pertama Luka Bakar!!" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+             <p style="text-align: center; margin-top: 30px; font-style: italic; color: #777;" class="animate-on-scroll">Video oleh: Ini Kata Dokter</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>© 2024 Informasi Pertolongan Pertama Luka Bakar DARATIN. <br>Konten ini bersifat edukasi dan tidak menggantikan saran medis profesional.</p>
+        </div>
+    </footer>
+
+    <!-- GSAP Core and ScrollTrigger Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
+
+    <script>
+        // --- Loading Screen Logic ---
+        window.onload = function() {
+            const loader = document.getElementById('loader');
+            setTimeout(() => {
+                 if(loader) {
+                    loader.classList.add('loaded');
+                 }
+            }, 500); // Min load time
+        };
+
+        // --- Three.js Particle Background Setup ---
+        // (Kode Three.js tetap sama)
+        let scene, camera, renderer, particles, particleMaterial;
+        let isThreeJSInitialized = false;
+        let isThreeJSAnimating = false; // Flag to control animation loop
+        let animationFrameId = null; // Store animation frame ID
+
+        function initThreeJS() {
+            try {
+                const canvas = document.getElementById('bg-canvas');
+                const wrapper = document.getElementById('bijak-wrapper'); // Get the wrapper
+                if (!canvas || !wrapper) return; // Check if both exist
+                scene = new THREE.Scene();
+                // Use wrapper dimensions for aspect ratio
+                camera = new THREE.PerspectiveCamera(75, wrapper.clientWidth / wrapper.clientHeight, 0.1, 1000);
+                renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+                // Use wrapper dimensions for renderer size
+                renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                renderer.setClearColor(0x000000, 0);
+                const particleCount = window.innerWidth < 768 ? 2000 : 4000;
+                const particlesGeometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(particleCount * 3);
+                const colors = new Float32Array(particleCount * 3);
+                const color = new THREE.Color();
+                const emberColors = [new THREE.Color(0xC70039), new THREE.Color(0xFF5733), new THREE.Color(0x900C3F), new THREE.Color(0xFF8D1A), new THREE.Color(0xFAA0A0)];
+                for (let i = 0; i < particleCount; i++) {
+                    const i3 = i * 3;
+                    positions[i3] = (Math.random() - 0.5) * 12;
+                    positions[i3 + 1] = (Math.random() - 0.5) * 12;
+                    positions[i3 + 2] = (Math.random() - 0.5) * 12;
+                    const randomColor = emberColors[Math.floor(Math.random() * emberColors.length)];
+                    colors[i3] = randomColor.r;
+                    colors[i3 + 1] = randomColor.g;
+                    colors[i3 + 2] = randomColor.b;
+                }
+                particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                particleMaterial = new THREE.PointsMaterial({ size: 0.02, sizeAttenuation: true, transparent: true, opacity: 0.65, vertexColors: true, blending: THREE.AdditiveBlending });
+                particles = new THREE.Points(particlesGeometry, particleMaterial);
+                scene.add(particles);
+                camera.position.z = 6;
+                window.addEventListener('resize', onWindowResize, false);
+                isThreeJSInitialized = true;
+                console.log("Three.js Initialized for BIJAK");
+                // console.log("Initial wrapper dimensions:", wrapper.clientWidth, "x", wrapper.clientHeight); // Remove log
+                // Restore original behavior: DO NOT start animation loop here
+            } catch (error) {
+                console.error("Error initializing Three.js:", error);
+                const canvas = document.getElementById('bg-canvas');
+                if (canvas) canvas.style.display = 'none';
+            }
+        }
+
+        function onWindowResize() {
+            const wrapper = document.getElementById('bijak-wrapper');
+            if (camera && renderer && wrapper) { // Check wrapper exists
+                // Use wrapper dimensions for aspect ratio
+                camera.aspect = wrapper.clientWidth / wrapper.clientHeight;
+                camera.updateProjectionMatrix();
+                // Use wrapper dimensions for renderer size
+                renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            }
+        }
+
+        const clock = new THREE.Clock();
+        function animateThreeJS() {
+            if (!isThreeJSAnimating || !renderer || !scene || !camera || !particles) {
+                // If animation stopped or not ready, cancel any pending frame and exit
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+                return;
+            }
+
+            const elapsedTime = clock.getElapsedTime();
+            particles.geometry.attributes.position.needsUpdate = true;
+            const positions = particles.geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i + 1] += 0.0015 + Math.sin(elapsedTime * 0.5 + positions[i] * 0.2) * 0.0005;
+                if (positions[i + 1] > 6) positions[i + 1] = -6;
+            }
+            particles.rotation.y = elapsedTime * 0.02;
+            renderer.render(scene, camera);
+            if (isThreeJSAnimating) { // Check flag *before* requesting next frame
+                animationFrameId = requestAnimationFrame(animateThreeJS);
+            } else {
+                 animationFrameId = null; // Ensure ID is cleared if stopped
+            }
+        }
+
+        function startThreeJSAnimation() {
+            if (isThreeJSInitialized && !isThreeJSAnimating) {
+                console.log("Starting BIJAK background animation");
+                isThreeJSAnimating = true;
+                animateThreeJS(); // Start the loop
+            }
+        }
+
+        function stopThreeJSAnimation() {
+            if (isThreeJSAnimating) {
+                console.log("Stopping BIJAK background animation");
+                isThreeJSAnimating = false;
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId); // Explicitly cancel the next frame
+                    animationFrameId = null;
+                }
+            }
+        }
+
+        // --- Initial Check ---
+        if (typeof THREE !== 'undefined' && window.WebGLRenderingContext) {
+            initThreeJS(); // Initialize Three.js setup
+            // Restore original behavior: Do not start animation here
+        } else {
+            console.warn("Three.js or WebGL not supported.");
+            const canvas = document.getElementById('bg-canvas');
+            if (canvas) canvas.style.display = 'none';
+        }
+
+
+        // --- GSAP Animations ---
+        if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // --- ScrollTrigger for BIJAK Background ---
+            // Wrap in window.onload to ensure layout is stable
+            window.addEventListener('load', () => {
+                if (isThreeJSInitialized) { // Only add trigger if Three.js setup succeeded
+                    // console.log("Setting up ScrollTrigger for BIJAK background"); // Removed log
+                    ScrollTrigger.create({
+                        trigger: "#bijak-wrapper",
+                        start: "top bottom", // Start when top of BIJAK hits bottom of viewport
+                        end: "bottom top",   // End when bottom of BIJAK hits top of viewport
+                        onEnter: startThreeJSAnimation, // Use function directly
+                        onLeave: stopThreeJSAnimation, // Use function directly
+                        onEnterBack: startThreeJSAnimation, // Use function directly
+                        onLeaveBack: stopThreeJSAnimation, // Use function directly
+                        // markers: true // Removed markers
+                    });
+                }
+                // Removed else block with log
+            });
+
+            // --- General Scroll Animations (for non-horizontal sections) ---
+            // Animate Headings and Paragraphs generally
+            gsap.utils.toArray('#definisi h2, #definisi p, #tingkatan h2, #tingkatan .section-subtitle, #jenis h2, #bijak-wrapper h2, #bijak-wrapper .section-subtitle, #video h2, #video p').forEach(el => {
+                gsap.from(el, {
+                    opacity: 0, y: 30, duration: 0.6, ease: "power1.out",
+                    scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none none" }
+                });
+            });
+
+            // Animate Tingkatan Table Rows
+            gsap.from(".tingkatan-table tbody tr", {
+                opacity: 0, y: 20, duration: 0.5, stagger: 0.1, ease: "power1.out",
+                scrollTrigger: { trigger: ".tingkatan-table", start: "top 85%", toggleActions: "play none none none" }
+            });
+
+            // Animate Jenis Items (Cards) with scale
+            gsap.from(".jenis-item", {
+                opacity: 0, y: 40, scale: 0.95, duration: 0.5, stagger: 0.1, ease: "power1.out",
+                scrollTrigger: { trigger: ".jenis-container", start: "top 85%", toggleActions: "play none none none" }
+            });
+
+            // TEMP: Disable Bijak Flag GSAP Animation
+            /*
+            gsap.from(".bijak-flag", {
+                opacity: 0,
+                scale: 0.8,
+                transformOrigin: "top center", // Animate scale from the top
+                visibility: 'visible',
+                duration: 0.8,
+                stagger: 0.2,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: ".bijak-flags-container",
+                    start: "top 80%",
+                    toggleActions: "play none none none" // Play animation once when triggered
+                }
+            });
+            */
+
+            // TEMP: Disable "Keep Expanded" JS
+            /*
+            const bijakFlags = document.querySelectorAll('.bijak-flag');
+            bijakFlags.forEach(flag => {
+                flag.addEventListener('mouseenter', () => {
+                    if (!flag.classList.contains('is-expanded')) {
+                        flag.classList.add('is-expanded');
+                    }
+                }, { once: false });
+            });
+            */
+
+            // Animate Video Wrapper
+            gsap.from(".video-wrapper", {
+                opacity: 0, scale: 0.9, duration: 0.8, ease: "power2.out",
+                scrollTrigger: { trigger: ".video-wrapper", start: "top 85%", toggleActions: "play none none none" }
+            });
+
+            // Remove the old combined loop if it still exists
+            // const animatedElements = gsap.utils.toArray(...)
+            // animatedElements.forEach(...)
+
+
+            // --- GSAP Animation for DARATIN Title ---
+            // const daratinTitle = document.querySelector('.daratin-title-animate');
+            // if (daratinTitle) {
+            //     gsap.fromTo(daratinTitle, {
+            //         opacity: 0,
+            //     }, {
+            //         opacity: 1,
+            //         duration: 0.8,
+            //         ease: "power1.out",
+        //         scrollTrigger: {
+        //             trigger: daratinTitle,
+        //             start: "top 85%",
+        //             onEnter: () => {
+        //                 gsap.to(daratinTitle, { opacity: 1, duration: 0.8, ease: "power1.out", overwrite: "auto" });
+        //             },
+        //             onEnterBack: () => {
+        //                 gsap.to(daratinTitle, { opacity: 1, duration: 0.8, ease: "power1.out", overwrite: "auto" });
+        //             }
+        //         },
+        //     });
+        //     gsap.to(daratinTitle, {
+        //         opacity: 0,
+        //         delay: 2,
+        //         duration: 0.8,
+        //         ease: "power1.out",
+        //         onComplete: () => {
+        //             const currentStep = daratinTitle.closest('.daratin-step');
+        //             if (currentStep) {
+        //                 const contentPanelHeight = gsap.getProperty(currentStep.querySelector('.content-panel'), "offsetHeight");
+        //                 const windowHeight = window.innerHeight;
+        //                 const requiredPadding = Math.max(0, (windowHeight - contentPanelHeight) / 2 - 20); // Subtract 20px for some extra spacing
+        //                 gsap.to(".daratin-steps", {
+        //                     paddingTop: `-${requiredPadding}px`,
+        //                     duration: 0.3,
+        //             overwrite: "auto"
+        //                 });
+        //             }
+        //     },
+        //     scrollTrigger: {
+        //         trigger: daratinTitle,
+        //         start: "top 85%",
+        //         invalidateOnRefresh: true
+        //     }
+        // });
+        // }
+
+
+            // --- GSAP Horizontal Scroll for DARATIN ---
+            const daratinSection = document.getElementById('daratin');
+            const stepsContainer = document.querySelector("#daratin .daratin-steps");
+            const steps = gsap.utils.toArray("#daratin .daratin-step");
+
+            if (daratinSection && stepsContainer && steps.length > 0) {
+
+                // Recalculate scroll distance more accurately considering potential gaps/margins
+                // Use scrollWidth of the container vs clientWidth of the viewport/section
+                // This requires the container (.daratin-steps) to have its direct children (.daratin-step)
+                // define its total width correctly (which flex + width: max-content should do).
+
+                // Let GSAP calculate the max scroll x value internally for robustness
+                let getMaxScroll = () => stepsContainer.scrollWidth - daratinSection.offsetWidth;
+
+                // Main horizontal scroll tween
+                let horizontalScrollTween = gsap.to(stepsContainer, {
+                    // Use direct x translation for precise control
+                    // Scroll only the width of (number of panels - 1) panels
+                    x: () => -( (steps.length - 1) * window.innerWidth ),
+                    ease: "none", // MUST be none for scrub
+                    scrollTrigger: {
+                        trigger: daratinSection,
+                        start: "top top", // Pin starts when section top hits viewport top
+                        // End trigger should be the scroll width minus the viewport width
+                        // End trigger distance should match the scroll distance
+                        end: () => `+=${(steps.length - 1) * window.innerWidth}`,
+                        scrub: 0.5, // Adjust scrub smoothness (lower is faster)
+                        pin: true,
+                        anticipatePin: 1, // Helps prevent jumping on pin
+                        invalidateOnRefresh: true,
+                        id: 'daratinScroll', // Give it an ID
+                        // markers: {startColor: "green", endColor: "red", indent: 50}, // Debug main scroll
+                    }
+                });
+
+                // Inner content animations for each panel
+                steps.forEach((step) => {
+                    // Animate the content panel itself and the letter
+                    const letterPanel = step.querySelector('.letter-panel');
+                    const contentPanel = step.querySelector('.content-panel');
+
+                    // Animate content panel
+                    gsap.from(contentPanel, {
+                        y: 50,
+                        opacity: 0,
+                        scale: 0.95,
+                        duration: 0.8,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: step, // Trigger based on the panel
+                            containerAnimation: horizontalScrollTween,
+                            start: "left 70%", // Trigger when panel is 70% visible
+                            end: "right 30%", // End when panel is 30% from the right edge
+                            toggleActions: "play none none reverse",
+                            // markers: {startColor: "orange", endColor: "purple", indent: 50} // Debug content panel
+                        }
+                    });
+
+                    // Animate letter panel (optional subtle effect)
+                    if (letterPanel) {
+                        gsap.from(letterPanel, {
+                            x: -30, // Slide in slightly from left
+                            opacity: 0.5,
+                            duration: 1.0,
+                            ease: "power2.out",
+                            scrollTrigger: {
+                                trigger: step,
+                                containerAnimation: horizontalScrollTween,
+                                start: "left 80%", // Trigger slightly later
+                                end: "right 20%",
+                                toggleActions: "play none none reverse",
+                                // markers: {startColor: "yellow", endColor: "lime", indent: 100} // Debug letter panel
+                            }
+                        });
+                    }
+                });
+            } else {
+                 console.error("DARATIN section or steps not found for horizontal scroll setup.");
+            }
+
+        } else {
+            console.warn("GSAP or ScrollTrigger not loaded.");
+            // Fallback if JS animation fails
+            document.querySelectorAll('.animate-on-scroll, .jenis-item, .daratin-step').forEach(el => el.style.opacity = 1);
+            document.getElementById('hero').style.opacity = 1;
+        }
+
+    </script>
+
+</body>
+</html>
