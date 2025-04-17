@@ -309,18 +309,6 @@
             background-color: #FFF8F8;
             position: relative; /* Needed for absolute positioned title */
         }
-        /*#daratin h2 { /* Title is now static within the section */
-        /*    text-align: left; /* Align to the left */
-        /*    opacity: 0; /* Start hidden for animation */
-        /*    margin-left: 5vw; /* Add some left margin */
-        /*    margin-bottom: 40px; /* Space below title */
-        /*    color: turquoise; /* Pale Turquoise */
-        /*    text-shadow: 0 0 10px rgba(175, 238, 238, 0.7), 0 0 18px rgba(175, 238, 238, 0.5);
-        /*    font-weight: bold;
-        /*    /* Removed absolute positioning, background, shadow, etc. */
-        /*    /* Add transition for fade-in */
-        /*    transition: opacity 0.8s ease-out;
-        }*/
 
         /* Container for the flex items (panels) */
         .daratin-steps {
@@ -409,6 +397,8 @@
             margin-bottom: 18px; /* More space below paragraphs */
             font-size: 0.9rem; /* Larger paragraph text */
             line-height: 1.5; /* Increase line height */
+            overflow-wrap: break-word; /* Prevent text overflow */
+            word-wrap: break-word; /* Legacy fallback */
         }
         .image-placeholder {
             height: 250px; /* Taller placeholder */
@@ -678,9 +668,187 @@
             .bijak-point { padding: 10px 18px; font-size: 0.9rem; }
             #bijak { border-radius: 5px; padding: 50px 15px; }
         }
+ 
+         /* --- Additional Responsive Styles --- */
+ 
+         /* Large Desktops / Laptops */
+         @media (max-width: 1200px) {
+             .container {
+                 max-width: 960px;
+             }
+             h1 { font-size: 2.8rem; }
+             h2 { font-size: 2.1rem; }
+             h3 { font-size: 1.4rem; }
+             #hero .subtitle { font-size: 2.5rem; }
+             .daratin-step .letter-panel { font-size: 28vh; }
+             .daratin-step h3 { font-size: 1.8rem; }
+             .bijak-flags-container { min-height: 110vh; }
+             .bijak-flag { min-width: 160px; }
+             .flag-letter { font-size: 5.5rem; }
+         }
 
-    </style>
-</head>
+         /* Large Desktops / Laptops */
+         @media (min-width: 1536px) {
+             .daratin-step .text-content h3 {
+                 font-size: 1.7rem; /* Reduce heading size */
+             }
+             .daratin-step .text-content p {
+                 font-size: 0.85rem; /* Reduce paragraph size */
+             }
+         }
+
+ 
+         /* Smaller Desktops / Tablets Landscape */
+         @media (max-width: 992px) {
+             .container {
+                 max-width: 720px;
+             }
+             h1 { font-size: 2.6rem; }
+             h2 { font-size: 2rem; }
+             h3 { font-size: 1.3rem; }
+             #hero { padding: 120px 0 100px 0; }
+             #hero .subtitle { font-size: 2.2rem; }
+             section { padding: 70px 0; }
+             .jenis-container { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 25px; }
+             .tingkatan-table { max-width: 100%; overflow-x: auto; display: block; white-space: nowrap; } /* Allow table scroll */
+             .daratin-steps { width: 100%; height: 75vh; } /* Adjust DARATIN container */
+             .daratin-step { flex: 0 0 95vw; margin: 0 2.5vw; }
+             .daratin-step .letter-panel { font-size: 25vh; flex-basis: 25%; }
+             .daratin-step .content-panel { flex-basis: 50%; }
+             .daratin-step .daratin-image { flex-basis: 25%; }
+             .daratin-step h3 { font-size: 1.7rem; }
+             .bijak-flags-container { flex-wrap: wrap; justify-content: space-around; min-height: auto; gap: 20px; padding-bottom: 40px; } /* Wrap flags */
+             .bijak-flag { width: 45%; min-width: 200px; max-height: 280px; clip-path: polygon(0 0, 100% 0, 100% 60%, 50% 80%, 0 60%); } /* Adjust flag size and shape */
+             .bijak-flag:hover { max-height: 2000px; clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%); }
+             .flag-letter { font-size: 5rem; }
+             #bijak-wrapper { min-height: auto; } /* Adjust wrapper height */
+         }
+ 
+         /* Tablets Portrait (Refined) */
+         @media (max-width: 768px) {
+             .container {
+                 max-width: 540px;
+                 padding: 0 20px;
+             }
+             h1 { font-size: 2.4rem; } /* Already set */
+             h2 { font-size: 1.9rem; } /* Already set */
+             h3 { font-size: 1.2rem; }
+             #hero { padding: 110px 0 90px 0; }
+             #hero .subtitle { font-size: 2rem; } /* Already set */
+             section { padding: 60px 0; } /* Already set */
+             #definisi p { max-width: 100%; font-size: 1rem; }
+             .tingkatan-table th, .tingkatan-table td { padding: 12px 10px; font-size: 0.9rem; } /* Already set */
+             .jenis-container { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; } /* Adjust grid */
+             /* DARATIN vertical layout for mobile */
+             #daratin {
+                 overflow: visible; /* Allow vertical scroll */
+                 padding-top: 40px; /* Add some top padding */
+             }
+             .daratin-steps {
+                 display: flex; /* Keep flex for column layout */
+                 flex-direction: column; /* Stack vertically */
+                 flex-wrap: wrap; /* Allow wrapping (though column makes it less relevant) */
+                 width: 100%; /* Full width */
+                 height: auto; /* Auto height */
+                 padding-top: 0; /* Reset padding */
+                 padding-bottom: 0;
+                 margin: 0; /* Reset margin */
+                 position: static; /* Reset position if needed */
+             }
+             .daratin-step {
+                 flex-direction: column; /* Stack inner elements */
+                 flex: 1 1 100%; /* Take full width */
+                 width: 100%;
+                 height: auto; /* Auto height */
+                 margin: 0 0 40px 0; /* Add bottom margin between steps */
+                 padding: 5vh 5vw;
+                 text-align: center;
+                 align-items: center; /* Center items horizontally */
+             }
+             .daratin-step .letter-panel {
+                 font-size: 20vh;
+                 margin-bottom: 10px;
+                 margin-right: 0; /* Reset margin */
+                 flex-basis: auto; /* Reset basis */
+             }
+             .daratin-step .content-panel {
+                 width: 90%;
+                 max-width: 500px; /* Limit content width */
+                 padding: 25px;
+                 margin-right: 0; /* Reset margin */
+                 flex-basis: auto; /* Reset basis */
+                 order: 2; /* Ensure content is below letter */
+             }
+             .daratin-step h3 { font-size: 1.6rem; } /* Already set */
+             .daratin-step p { font-size: 0.95rem; }
+             .daratin-image {
+                 max-width: 200px;
+                 margin: 25px auto 0; /* Adjust margin */
+                 display: block;
+                 flex-basis: auto; /* Reset basis */
+                 order: 3; /* Ensure image is below content */
+             }
+             .bijak-flag { width: 46%; min-width: 180px; max-height: 260px; } /* Adjust flag size */
+             .flag-letter { font-size: 4.5rem; }
+             .flag-text-letters span { font-size: 1.3rem; }
+             .video-wrapper { max-width: 100%; }
+             footer { padding: 30px 0; font-size: 0.85rem; }
+         }
+ 
+         /* Mobile Landscape & Small Tablets (Refined) */
+         @media (max-width: 576px) {
+             .container { padding: 0 15px; } /* Already set */
+             h1 { font-size: 2rem; } /* Already set */
+             h2 { font-size: 1.7rem; } /* Already set */
+             h3 { font-size: 1.1rem; }
+             #hero { padding: 100px 0 80px 0; } /* Already set */
+             #hero .subtitle { font-size: 1.8rem; } /* Already set */
+             section { padding: 50px 0; } /* Already set */
+             .tingkatan-table th, .tingkatan-table td { padding: 10px 8px; font-size: 0.85rem; } /* Already set */
+             .jenis-container { grid-template-columns: 1fr; gap: 15px; } /* Already set */
+             .jenis-item { padding: 25px 15px; }
+             .daratin-step { padding: 4vh 5vw; } /* Adjust padding */
+             .daratin-step .letter-panel { font-size: 18vh; } /* Already set */
+             .daratin-step .content-panel { width: 95%; padding: 20px; } /* Already set */
+             .daratin-step h3 { font-size: 1.4rem; } /* Already set */
+             .daratin-step p { font-size: 0.9rem; }
+             .daratin-image { max-width: 180px; }
+             .bijak-flags-container { gap: 15px; }
+             .bijak-flag { width: 80%; min-width: 0; max-width: 300px; max-height: 240px; } /* Stack flags */
+             .flag-letter { font-size: 4rem; }
+             .flag-text-letters span { font-size: 1.2rem; }
+         }
+ 
+         /* Small Mobiles */
+         @media (max-width: 480px) {
+             body { line-height: 1.6; }
+             h1 { font-size: 1.8rem; }
+             h2 { font-size: 1.5rem; }
+             h3 { font-size: 1rem; }
+             #hero { padding: 80px 0 60px 0; }
+             #hero .subtitle { font-size: 1.6rem; }
+             #hero p { font-size: 1rem; }
+             section { padding: 40px 0; }
+             .container { padding: 0 10px; }
+             #definisi p { font-size: 0.95rem; }
+             .tingkatan-table th, .tingkatan-table td { font-size: 0.8rem; padding: 8px 5px; }
+             .jenis-item .icon i { font-size: 2.5rem; }
+             .jenis-item h3 { font-size: 1.1rem; }
+             .jenis-item p { font-size: 0.85rem; }
+             .daratin-step { padding: 3vh 5vw; }
+             .daratin-step .letter-panel { font-size: 16vh; }
+             .daratin-step .content-panel { padding: 15px; }
+             .daratin-step h3 { font-size: 1.3rem; }
+             .daratin-step p { font-size: 0.85rem; }
+             .daratin-image { max-width: 250px; }
+             .bijak-flag { width: 90%; max-height: 220px; }
+             .flag-letter { font-size: 3.5rem; }
+             .flag-text-letters span { font-size: 1.1rem; }
+             footer { font-size: 0.8rem; }
+         }
+ 
+     </style>
+ </head>
 <body>
 
     <!-- Loading Screen -->
@@ -1234,88 +1402,158 @@
         // }
 
 
-            // --- GSAP Horizontal Scroll for DARATIN ---
-            const daratinSection = document.getElementById('daratin');
-            const stepsContainer = document.querySelector("#daratin .daratin-steps");
-            const steps = gsap.utils.toArray("#daratin .daratin-step");
-
-            if (daratinSection && stepsContainer && steps.length > 0) {
-
-                // Recalculate scroll distance more accurately considering potential gaps/margins
-                // Use scrollWidth of the container vs clientWidth of the viewport/section
-                // This requires the container (.daratin-steps) to have its direct children (.daratin-step)
-                // define its total width correctly (which flex + width: max-content should do).
-
-                // Let GSAP calculate the max scroll x value internally for robustness
-                let getMaxScroll = () => stepsContainer.scrollWidth - daratinSection.offsetWidth;
-
-                // Main horizontal scroll tween
-                let horizontalScrollTween = gsap.to(stepsContainer, {
-                    // Use direct x translation for precise control
-                    // Scroll only the width of (number of panels - 1) panels
-                    x: () => -( (steps.length - 1) * window.innerWidth ),
-                    ease: "none", // MUST be none for scrub
-                    scrollTrigger: {
-                        trigger: daratinSection,
-                        start: "top top", // Pin starts when section top hits viewport top
-                        // End trigger should be the scroll width minus the viewport width
-                        // End trigger distance should match the scroll distance
-                        end: () => `+=${(steps.length - 1) * window.innerWidth}`,
-                        scrub: 0.5, // Adjust scrub smoothness (lower is faster)
-                        pin: true,
-                        anticipatePin: 1, // Helps prevent jumping on pin
-                        invalidateOnRefresh: true,
-                        id: 'daratinScroll', // Give it an ID
-                        // markers: {startColor: "green", endColor: "red", indent: 50}, // Debug main scroll
-                    }
-                });
-
-                // Inner content animations for each panel
-                steps.forEach((step) => {
-                    // Animate the content panel itself and the letter
-                    const letterPanel = step.querySelector('.letter-panel');
-                    const contentPanel = step.querySelector('.content-panel');
-
-                    // Animate content panel
-                    gsap.from(contentPanel, {
-                        y: 50,
-                        opacity: 0,
-                        scale: 0.95,
-                        duration: 0.8,
-                        ease: "power2.out",
-                        scrollTrigger: {
-                            trigger: step, // Trigger based on the panel
-                            containerAnimation: horizontalScrollTween,
-                            start: "left 70%", // Trigger when panel is 70% visible
-                            end: "right 30%", // End when panel is 30% from the right edge
-                            toggleActions: "play none none reverse",
-                            // markers: {startColor: "orange", endColor: "purple", indent: 50} // Debug content panel
-                        }
-                    });
-
-                    // Animate letter panel (optional subtle effect)
-                    if (letterPanel) {
-                        gsap.from(letterPanel, {
-                            x: -30, // Slide in slightly from left
-                            opacity: 0.5,
-                            duration: 1.0,
-                            ease: "power2.out",
+            // --- GSAP Horizontal Scroll for DARATIN (Conditional) ---
+            ScrollTrigger.matchMedia({
+                // Desktop/Tablet Landscape (Enable Horizontal Scroll)
+                "(min-width: 769px)": function() {
+                    const daratinSection = document.getElementById('daratin');
+                    const stepsContainer = document.querySelector("#daratin .daratin-steps");
+                    const steps = gsap.utils.toArray("#daratin .daratin-step");
+ 
+                     if (daratinSection && stepsContainer && steps.length > 0) {
+                         // Ensure container styles are correct for horizontal scroll
+                         gsap.set(daratinSection, { overflow: 'hidden' }); // Hide overflow for pinning
+                         gsap.set(stepsContainer, { display: 'flex', flexWrap: 'nowrap', width: `${steps.length * 100}vw`, height: '80vh' }); // Set explicit width and height
+                         gsap.set(steps, { flex: '0 0 90vw', height: '100%', margin: '0 5vw', flexDirection: 'row' }); // Reset mobile styles if needed
+ 
+                         // Recalculate scroll distance more accurately considering potential gaps/margins
+                         // Use scrollWidth of the container vs clientWidth of the viewport/section
+                         // This requires the container (.daratin-steps) to have its direct children (.daratin-step)
+                         // define its total width correctly (which flex + width: max-content should do).
+ 
+                         // Let GSAP calculate the max scroll x value internally for robustness
+                         let getMaxScroll = () => stepsContainer.scrollWidth - daratinSection.offsetWidth;
+ 
+                         // Main horizontal scroll tween
+                         let horizontalScrollTween = gsap.to(stepsContainer, {
+                             // Use direct x translation for precise control
+                             // Scroll only the width of (number of panels - 1) panels
+                             x: () => -( (steps.length - 1) * window.innerWidth ), // Adjust calculation if needed based on panel width/margins
+                             ease: "none", // MUST be none for scrub
+                             scrollTrigger: {
+                                 trigger: daratinSection,
+                                 start: "top top", // Pin starts when section top hits viewport top
+                                 // End trigger should be the scroll width minus the viewport width
+                                 // End trigger distance should match the scroll distance
+                                 end: () => `+=${stepsContainer.scrollWidth - window.innerWidth}`, // End based on scroll width
+                                 scrub: 0.5, // Adjust scrub smoothness (lower is faster)
+                                 pin: true,
+                                 anticipatePin: 1, // Helps prevent jumping on pin
+                                 invalidateOnRefresh: true,
+                                 id: 'daratinScroll', // Give it an ID
+                                 // markers: {startColor: "green", endColor: "red", indent: 50}, // Debug main scroll
+                             }
+                         });
+ 
+                         // Inner content animations for each panel
+                         steps.forEach((step) => {
+                             // Animate the content panel itself and the letter
+                             const letterPanel = step.querySelector('.letter-panel');
+                             const contentPanel = step.querySelector('.content-panel');
+ 
+                             // Animate content panel
+                             gsap.from(contentPanel, {
+                                 y: 50,
+                                 opacity: 0,
+                                 scale: 0.95,
+                                 duration: 0.8,
+                                 ease: "power2.out",
+                                 scrollTrigger: {
+                                     trigger: step, // Trigger based on the panel
+                                     containerAnimation: horizontalScrollTween,
+                                     start: "left 70%", // Trigger when panel is 70% visible
+                                     end: "right 30%", // End when panel is 30% from the right edge
+                                     toggleActions: "play none none reverse",
+                                     // markers: {startColor: "orange", endColor: "purple", indent: 50} // Debug content panel
+                                 }
+                             });
+ 
+                             // Animate letter panel (optional subtle effect)
+                             if (letterPanel) {
+                                 gsap.from(letterPanel, {
+                                     x: -30, // Slide in slightly from left
+                                     opacity: 0.5,
+                                     duration: 1.0,
+                                     ease: "power2.out",
+                                     scrollTrigger: {
+                                         trigger: step,
+                                         containerAnimation: horizontalScrollTween,
+                                         start: "left 80%", // Trigger slightly later
+                                         end: "right 20%",
+                                         toggleActions: "play none none reverse",
+                                         // markers: {startColor: "yellow", endColor: "lime", indent: 100} // Debug letter panel
+                                     }
+                                 });
+                             }
+                         });
+ 
+                         // Return a cleanup function
+                         return () => {
+                             console.log("Cleaning up horizontal scroll (desktop)");
+                             if (horizontalScrollTween) {
+                                 const trigger = ScrollTrigger.getById('daratinScroll');
+                                 if (trigger) trigger.kill();
+                                 horizontalScrollTween.kill();
+                             }
+                             // Kill individual step animations if needed (might not be necessary if containerAnimation handles it)
+                             steps.forEach(step => gsap.killTweensOf(step.querySelectorAll('.content-panel, .letter-panel')));
+                             // Reset styles applied by GSAP for horizontal mode
+                             gsap.set(daratinSection, { clearProps: "overflow" });
+                             gsap.set(stepsContainer, { clearProps: "display,flexWrap,width,height,transform" }); // Clear transform (x)
+                             gsap.set(steps, { clearProps: "flex,height,margin,flexDirection" });
+                         };
+                     } else {
+                          console.error("DARATIN section or steps not found for horizontal scroll setup (desktop).");
+                          return () => {}; // Return empty cleanup
+                     }
+                },
+ 
+                // Mobile (Disable Horizontal Scroll)
+                "(max-width: 768px)": function() {
+                    console.log("Setting up vertical scroll (mobile)");
+                    // Ensure any existing horizontal scroll triggers/tweens are killed
+                    const trigger = ScrollTrigger.getById('daratinScroll');
+                    if (trigger) trigger.kill();
+                    const stepsContainer = document.querySelector("#daratin .daratin-steps");
+                    if (stepsContainer) gsap.killTweensOf(stepsContainer); // Kill potential x tween
+ 
+                    // Reset styles explicitly for vertical layout (CSS should handle most)
+                    const daratinSection = document.getElementById('daratin');
+                    const steps = gsap.utils.toArray("#daratin .daratin-step");
+                    gsap.set(daratinSection, { clearProps: "overflow" });
+                    gsap.set(stepsContainer, { clearProps: "display,flexWrap,width,height,transform" });
+                    gsap.set(steps, { clearProps: "flex,height,margin,flexDirection" });
+ 
+                    // Add simple fade-in animations for mobile if desired
+                    steps.forEach((step) => {
+                        gsap.from(step, {
+                            opacity: 0,
+                            y: 30,
+                            duration: 0.6,
+                            ease: "power1.out",
                             scrollTrigger: {
                                 trigger: step,
-                                containerAnimation: horizontalScrollTween,
-                                start: "left 80%", // Trigger slightly later
-                                end: "right 20%",
-                                toggleActions: "play none none reverse",
-                                // markers: {startColor: "yellow", endColor: "lime", indent: 100} // Debug letter panel
+                                start: "top 85%",
+                                toggleActions: "play none none none"
                             }
                         });
-                    }
-                });
-            } else {
-                 console.error("DARATIN section or steps not found for horizontal scroll setup.");
-            }
-
-        } else {
+                    });
+ 
+                    // Return a cleanup function for mobile animations
+                    return () => {
+                        console.log("Cleaning up vertical scroll animations (mobile)");
+                        steps.forEach(step => {
+                            const trigger = ScrollTrigger.getTweensOf(step)[0]?.scrollTrigger;
+                            if (trigger) trigger.kill();
+                            gsap.killTweensOf(step);
+                        });
+                         // Reset styles applied by GSAP for vertical mode (if any)
+                         gsap.set(steps, { clearProps: "opacity,transform" });
+                    };
+                }
+            });
+ 
+         } else {
             console.warn("GSAP or ScrollTrigger not loaded.");
             // Fallback if JS animation fails
             document.querySelectorAll('.animate-on-scroll, .jenis-item, .daratin-step').forEach(el => el.style.opacity = 1);
